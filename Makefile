@@ -1,9 +1,9 @@
 .DEFAULT_GOAL := wave
 USE_TOOLS := 1
 TOOLS_IS_BASIC := 1
-DIRS := $(shell find . -maxdepth 3 -type d)
-INC := ./ $(foreach dir,$(DIRS),$(wildcard $(dir)/*.v))
-INC_BASIC := ./ Top.v tb_Top.v ./utils/fifo/Fifo_Sync.v ./utils/ram/Ram.v
+DIRS := $(shell find ./utils -maxdepth 3 -type d)
+INC := ./ $(foreach dir,$(DIRS),$(wildcard $(dir)/*.v)) Top.v tb_Top.v
+INC_BASIC := ./ Top.v tb_Top.v ./utils/fifo_sync/Fifo_Sync.v ./utils/ram_simple/Ram.v
 
 OUT = ./gen/wave
 
