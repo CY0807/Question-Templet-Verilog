@@ -35,7 +35,7 @@ always #(PERIOD/2) clk = ~clk;
 // work flow
 initial begin
     $display("\n***** Simulation Begin *****\n");
-    clk = 0;
+    clk = 1;
     rst_n = 0;
     is_finish = 0;
     #100;

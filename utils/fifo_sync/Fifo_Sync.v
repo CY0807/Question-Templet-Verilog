@@ -25,7 +25,7 @@ localparam ALMOST_FULL=DEPTH-3; // number of items less than DEPTH
 reg [WIDTH-1:0] wr_data_reg;
 reg [$clog2(DEPTH)-1:0] wPtr;
 reg [$clog2(DEPTH)-1:0] rPtr;
-reg [$clog2(DEPTH):0] cnt;
+reg [$clog2(DEPTH)-1:0] cnt;
 wire fifoWrValid;
 wire fifoRdValid;
 
