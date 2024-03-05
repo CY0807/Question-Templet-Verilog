@@ -4,31 +4,36 @@
 
 module Ram_Async
 #(
-    parameter WIDTH_WR=8,
-    parameter DEPTH_WR=128,
-    parameter WIDTH_RD=16,
-    parameter DEPTH_RD=64
+    parameter DWI = 8   ,   // data width in
+    parameter AWI = 7   ,   // address width in
+    parameter DWO = 16  ,   // data width out
+    parameter AWO = 6       // address width out
 )
 (
-    input                               wr_clk    ,
-    input                               wr_en     ,            
-    input       [$clog2(DEPTH_WR)-1:0]  wr_addr   ,
-    input       [WIDTH_WR-1:0]          wr_data   ,
+    input                       wr_clk    ,
+    input                       wr_en     ,            
+    input       [AWI-1:0]       wr_addr   ,
+    input       [DWI-1:0]       wr_data   ,
 
-    input                               rd_clk    ,
-    input       [$clog2(DEPTH_RD)-1:0]  rd_addr   ,
-    output reg  [WIDTH_RD-1:0]          rd_data
+    input                       rd_clk    ,
+    input       [AWO-1:0]       rd_addr   ,
+    output reg  [DWO-1:0]       rd_data
 );
 
-localparam IS_EXPAND = WIDTH_WR < WIDTH_RD ? 1 : 0;
-localparam EXPAND = WIDTH_RD / WIDTH_WR;
-localparam SHRINK = WIDTH_WR / WIDTH_RD;
+localparam DEPTH_WR = {1'b1, {AWI{1'b0}}};
+localparam DEPTH_RD = {1'b1, {AWO{1'b0}}};
+
+localparam IS_EXPAND = DWI < DWO ? 1 : 0;
+localparam EXPAND = DWO / DWI;
+localparam SHRINK = DWI / DWO;
+localparam EXPAND_BIT = AWI - AWO;
+localparam SHRINK_BIT = AWO - AWI;
 
 genvar i;
 generate
     if(IS_EXPAND) begin
         // mem
-        reg [WIDTH_WR-1:0] mem [0:DEPTH_WR-1];
+        reg [DWI-1:0] mem [0:DEPTH_WR-1];
 
         // write
         always@(posedge wr_clk) begin
@@ -40,7 +45,7 @@ generate
         // read
         for(i=0; i<EXPAND; i=i+1) begin
             always@(posedge rd_clk) begin           
-                rd_data[WIDTH_RD-1-i*WIDTH_WR : WIDTH_RD-(i+1)*WIDTH_WR] <= mem[rd_addr*EXPAND + i]; 
+                rd_data[DWO-1-i*DWI : DWO-(i+1)*DWI] <= mem[(rd_addr << EXPAND_BIT) + i]; 
                 // Big-Endian
             end
         end
@@ -48,13 +53,13 @@ generate
 
     else begin
         // mem
-        reg [WIDTH_RD-1:0] mem [0:DEPTH_RD-1];
+        reg [DWO-1:0] mem [0:DEPTH_RD-1];
 
         // write
         for(i=0; i<SHRINK; i=i+1) begin
             always@(posedge wr_clk) begin
                 if(wr_en) begin         
-                    mem[wr_addr*SHRINK + i] <= wr_data[WIDTH_WR-1-i*WIDTH_RD : WIDTH_WR-(i+1)*WIDTH_RD];
+                    mem[(wr_addr << SHRINK_BIT) + i] <= wr_data[DWI-1-i*DWO : DWI-(i+1)*DWO];
                     // Big-Endian
                 end
             end
@@ -75,10 +80,10 @@ endmodule
 
 Ram_Async
 #( 
-    .WIDTH_WR(8),
-    .DEPTH_WR(128),
-    .WIDTH_RD(16),
-    .DEPTH_RD(64)
+    .DWI (8  )  ,   // data width in
+    .AWI (7  )  ,   // address width in
+    .DWO (16 )  ,   // data width out
+    .AWO (6  )      // address width out
 )
 Ram_Async_inst
 (
