@@ -29,6 +29,9 @@ wire               full             ;
 wire               empty            ;
 wire               almost_full      ;
 wire               almost_empty     ;
+wire    [AWI:0]    wr_data_cnt      ;
+wire    [AWO:0]    rd_data_cnt      ;
+
 
 // simulation signals
 reg is_finish;
@@ -132,8 +135,10 @@ Fifo_Async_inst
     .rd_data        (rd_data      ),
     .full           (full         ),
     .almost_full    (almost_full  ),
+    .wr_data_cnt    (wr_data_cnt  ),
     .empty          (empty        ),
-    .almost_empty   (almost_empty )
+    .almost_empty   (almost_empty ),
+    .rd_data_cnt    (rd_data_cnt  )
 );
 
 endmodule

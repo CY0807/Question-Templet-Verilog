@@ -22,8 +22,10 @@ module Fifo_Async
 
     output                    full            ,
     output                    almost_full     ,
+    output      [AWO:0]       rd_data_cnt     ,
     output                    empty           ,
-    output                    almost_empty
+    output                    almost_empty    ,
+    output      [AWI:0]       wr_data_cnt
 );
 
 localparam DEPTH_WR = {1'b1, {AWI{1'b0}}};
@@ -48,6 +50,7 @@ wire    [AWO-1:0]       rd_ptr_pre_1                ;
 wire    [AWO-1:0]       rd_ptr_pre_almost           ;
 reg                     wr_over, rd_over            ; // overflow flags
 wire                    wr_over_2rd, rd_over_2wr    ;
+wire                    over_flag                   ;
 
 // write ptr
 always@(posedge wr_clk or negedge rst_n) begin
@@ -101,6 +104,7 @@ Cnt_Cross_clock_rdptr_2wr (
 
 // full, empty signals .etc
 
+assign over_flag = wr_over == rd_over;
 assign wr_ptr_pre_1 = wr_ptr + 1;
 assign wr_ptr_pre_almost = wr_ptr + ALMOST_THRESH;
 assign rd_ptr_pre_1 = rd_ptr + 1;
@@ -109,17 +113,23 @@ assign rd_ptr_pre_almost = rd_ptr + ALMOST_THRESH;
 genvar i;
 generate
     if(IS_EXPAND) begin
-        assign empty        = (rd_ptr_pre_1<<EXPAND_BIT >= wr_ptr_2rd)          && (wr_over_2rd == rd_over);
-        assign almost_empty = (rd_ptr_pre_almost<<EXPAND_BIT >= wr_ptr_2rd)     && (wr_over_2rd == rd_over);
-        assign full         = (rd_ptr_2wr<<EXPAND_BIT <= wr_ptr_pre_1)          && (wr_over != rd_over_2wr);
-        assign almost_full  = (rd_ptr_2wr<<EXPAND_BIT <= wr_ptr_pre_almost)     && (wr_over != rd_over_2wr);
+        assign empty        = (rd_ptr_pre_1<<EXPAND_BIT >= wr_ptr_2rd)          && over_flag    ;
+        assign almost_empty = (rd_ptr_pre_almost<<EXPAND_BIT >= wr_ptr_2rd)     && over_flag    ;
+        assign full         = (rd_ptr_2wr<<EXPAND_BIT <= wr_ptr_pre_1)          && !over_flag   ;
+        assign almost_full  = (rd_ptr_2wr<<EXPAND_BIT <= wr_ptr_pre_almost)     && !over_flag   ;
+
+        assign rd_data_cnt = ({~over_flag, wr_ptr_2rd} >> EXPAND_BIT) - rd_ptr;
+        assign wr_data_cnt = {~over_flag, wr_ptr} - (rd_ptr_2wr<<EXPAND_BIT);
     end
 
     else begin
-        assign empty        = (rd_ptr_pre_1 >= wr_ptr_2rd<<SHRINK_BIT)          && (wr_over_2rd == rd_over);
-        assign almost_empty = (rd_ptr_pre_almost >= wr_ptr_2rd<<SHRINK_BIT)     && (wr_over_2rd == rd_over);
-        assign full         = (rd_ptr_2wr <= wr_ptr_pre_1<<SHRINK_BIT)          && (wr_over != rd_over_2wr);
-        assign almost_full  = (rd_ptr_2wr <= wr_ptr_pre_almost<<SHRINK_BIT)     && (wr_over != rd_over_2wr);
+        assign empty        = (rd_ptr_pre_1 >= wr_ptr_2rd<<SHRINK_BIT)          && over_flag    ;
+        assign almost_empty = (rd_ptr_pre_almost >= wr_ptr_2rd<<SHRINK_BIT)     && over_flag    ;
+        assign full         = (rd_ptr_2wr <= wr_ptr_pre_1<<SHRINK_BIT)          && !over_flag   ;
+        assign almost_full  = (rd_ptr_2wr <= wr_ptr_pre_almost<<SHRINK_BIT)     && !over_flag   ;
+
+        assign rd_data_cnt = ({~over_flag, wr_ptr_2rd}<<SHRINK_BIT) - rd_ptr;
+        assign wr_data_cnt = {~over_flag, wr_ptr} - (rd_ptr_2wr>>SHRINK_BIT);
     end
 endgenerate
 
@@ -137,7 +147,7 @@ Ram_Async
 Ram_Async_inst
 (
     .wr_clk    (wr_clk   ),     
-    .wr_en     (wr_en && !full),
+    .wr_en     (wr_en & !full),
     .wr_addr   (wr_ptr   ),
     .wr_data   (wr_data  ),
     .rd_clk    (rd_clk   ),
@@ -169,8 +179,10 @@ Fifo_Async_inst
     .rd_data        (rd_data      ), // [DWO-1:0]
     .full           (full         ),
     .almost_full    (almost_full  ),
+    .wr_data_cnt    (wr_data_cnt  ), // [AWI-1:0]
     .empty          (empty        ),
-    .almost_empty   (almost_empty )
+    .almost_empty   (almost_empty ),
+    .rd_data_cnt    (rd_data_cnt  )  // [AWO-1:0]
 );
 
 */
