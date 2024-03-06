@@ -37,7 +37,6 @@ initial begin
     $display("\n***** Simulation Begin *****\n");
     clk = 1;
     rst_n = 0;
-    is_finish = 0;
     #100;
     rst_n = 1;
     
@@ -49,8 +48,17 @@ end
 
 // init vars
 initial begin
+    i = 0;
+    is_finish = 0;
     a = 0;
     b = 0;
+end
+
+// time out
+initial begin
+    # (PERIOD * 50000 * 2) // 2ms @ 50MHz
+    $display("\n***** Timeout Finish *****\n");
+    $finish;
 end
 
 // simulation logic
