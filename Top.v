@@ -6,16 +6,16 @@
 
 module Top
 #( 
-    parameter P1 = 1,
-    parameter P2 = 2
+  parameter P1 = 1,
+  parameter P2 = 2
 )
 (
-    input  wire clk,
-    input  wire rst_n,
+  input  wire clk,
+  input  wire rst_n,
 
-    input  wire a,
-    input  wire b,
-    output wire c
+  input  wire a,
+  input  wire b,
+  output wire c
     
 );
     
@@ -34,16 +34,16 @@ endmodule
 
 Top 
 #( 
-    .P1(1),
-    .P2(2)
+  .P1(1),
+  .P2(2)
 )
 Top_inst
 (
-    .clk(clk),
-    .rst_n(rst_n),
-    .a(a),
-    .b(b),
-    .c(c)
+  .clk(clk),
+  .rst_n(rst_n),
+  .a(a),
+  .b(b),
+  .c(c)
 );
 
 */
