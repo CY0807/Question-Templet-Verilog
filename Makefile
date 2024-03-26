@@ -11,9 +11,9 @@ build:
 	mkdir -p gen
 ifeq ($(USE_TOOLS),1)
     ifeq ($(TOOLS_IS_BASIC),1)
-	iverilog -o $(OUT) -y $(INC_BASIC)
+		iverilog -o $(OUT) -y $(INC_BASIC)
     else
-	iverilog -o $(OUT) -y $(INC)
+		iverilog -o $(OUT) -y $(INC)
     endif
 else
 	iverilog -o $(OUT) -y ./ Top.v tb_Top.v
@@ -24,7 +24,9 @@ endif
 wave: build
 	gtkwave ./gen/wave.vcd
 
-.PHONY : clean build wave
+.PHONY := clean build wave
+.DEFAULT_GOAL := wave
+
 
 clean:
 	-rm -r ./gen/ 2>/dev/null
