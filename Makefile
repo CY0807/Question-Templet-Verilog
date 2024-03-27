@@ -1,4 +1,3 @@
-.DEFAULT_GOAL := wave
 USE_TOOLS := 1
 TOOLS_IS_BASIC := 1
 DIRS := $(shell find ./utils -maxdepth 3 -type d)
@@ -23,6 +22,9 @@ endif
 
 wave: build
 	gtkwave ./gen/wave.vcd
+
+autopush:
+	@git add .; git commit -m "auto commit"; git push -u main > 1
 
 .PHONY := clean build wave
 .DEFAULT_GOAL := wave
