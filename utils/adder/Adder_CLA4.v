@@ -1,15 +1,15 @@
 
 module Adder_CLA4
 (
-	input   [3:0]   A    ,
-	input   [3:0]   B    ,
-    input           C_in ,
-	output  [4:0]   OUT  ,
-    output          G    ,
-    output          P
+	input   [3:0]   A     ,
+	input   [3:0]   B     ,
+  input           C_in  ,
+	output  [4:0]   C_out ,
+  output          G     ,
+  output          P
 );
 
-wire [3:0] S;
+wire [3:0] S, Gi, Pi;
 wire [4:0] Ci;
 
 assign Ci[0] = C_in;
@@ -22,23 +22,23 @@ generate
 			.B      (B[i]   ),
 			.C_in   (Ci[i]  ),
 			.S      (S[i]   ),
-			.G      (G[i]   ),
-			.P      (P[i]   )
+			.G      (Gi[i]  ),
+			.P      (Pi[i]  )
 		);
 	end
 endgenerate
 
 CLA_4 CLA_4_inst
 (
-	.P      (P        ),
-	.G      (G        ),
+	.P      (Pi       ),
+	.G      (Gi       ),
 	.C_in   (C_in     ),
 	.Ci     (Ci[4:1]  ),
 	.Gm     (G        ),
 	.Pm     (P        )
 );
 
-assign OUT = {Ci[4], S};
+assign C_out = {Ci[4], S};
 
 
 endmodule
@@ -48,12 +48,12 @@ endmodule
 
 Adder_CLA4 Adder_CLA4_inst
 (
-	.A    (A    ) ,
-	.B    (B    ) ,
-    .C_in (C_in ) ,
-	.OUT  (OUT  ) ,
-    .G    (G    ) ,
-    .P    (P    ) 
+	.A      (A      ),
+	.B      (B      ),
+  .C_in   (C_in   ),
+	.C_out  (C_out  ),
+  .G      (G      ),
+  .P      (P      ) 
 );
 
 
