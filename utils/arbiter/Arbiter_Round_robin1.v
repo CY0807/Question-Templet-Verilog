@@ -10,35 +10,35 @@
 
 module Arbiter_Round_robin1
 #(
-    parameter REQ_WIDTH = 8
+  parameter REQ_WIDTH = 8
 )
 (
-    input                   clk     ,
-    input                   rst_n   ,
-    input   [REQ_WIDTH-1:0] req     ,
-    output  [REQ_WIDTH-1:0] gnt
+  input                   clk     ,
+  input                   rst_n   ,
+  input   [REQ_WIDTH-1:0] req     ,
+  output  [REQ_WIDTH-1:0] gnt
 );
 
 reg [REQ_WIDTH-1:0] base;
 
 always@(posedge clk or negedge rst_n) begin
-    if(!rst_n) begin
-        base <= 'd1;
-    end
-    else if(|req) begin
-        base <= {gnt[REQ_WIDTH-2:0], gnt[REQ_WIDTH-1]};
-    end
+  if(!rst_n) begin
+    base <= 'd1;
+  end
+  else if(|req) begin
+    base <= {gnt[REQ_WIDTH-2:0], gnt[REQ_WIDTH-1]};
+  end
 end
 
 Arbiter_base
 #(
-    .REQ_WIDTH(REQ_WIDTH)
+  .REQ_WIDTH(REQ_WIDTH)
 )
 Arbiter_base_inst
 (
-    .req        (req    ),
-    .base       (base   ),
-    .gnt        (gnt    )
+  .req        (req    ),
+  .base       (base   ),
+  .gnt        (gnt    )
 );
 
 endmodule
@@ -49,14 +49,14 @@ endmodule
 
 Arbiter_Round_robin1
 #(
-    .parameter REQ_WIDTH(8)
+  .parameter REQ_WIDTH(8)
 )
 Arbiter_Round_Robin1_inst
 (
-    .clk     (clk  ),
-    .rst_n   (rst_n),
-    .req     (req  ),
-    .gnt     (gnt  )
+  .clk     (clk  ),
+  .rst_n   (rst_n),
+  .req     (req  ),
+  .gnt     (gnt  )
 );
 
 */   

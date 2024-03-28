@@ -10,51 +10,51 @@
 
 module Arbiter_Round_robin2
 #(
-    parameter REQ_WIDTH = 8
+  parameter REQ_WIDTH = 8
 )
 (
-    input                   clk     ,
-    input                   rst_n   ,
-    input   [REQ_WIDTH-1:0] req     ,
-    output  [REQ_WIDTH-1:0] gnt
+  input                   clk     ,
+  input                   rst_n   ,
+  input   [REQ_WIDTH-1:0] req     ,
+  output  [REQ_WIDTH-1:0] gnt
 );
 
 reg [REQ_WIDTH-1:0] mask;
-wire [REQ_WIDTH-1:0] req_mask, req_unmask, req_pre, gnt_mask, gnt_unmask;
+wire [REQ_WIDTH-1:0] req_mask, req_unmask, to_mask, gnt_mask, gnt_unmask;
 
-assign req_pre[0] = 1'b0;
-assign req_pre[REQ_WIDTH-1:1] = req_pre[REQ_WIDTH-2:0] | gnt[REQ_WIDTH-2:0];
+assign to_mask[0] = 1'b0;
+assign to_mask[REQ_WIDTH-1:1] = to_mask[REQ_WIDTH-2:0] | gnt[REQ_WIDTH-2:0];
 assign req_mask = req & mask;
 assign req_unmask = req;
 assign gnt = (|req_mask) ? gnt_mask : gnt_unmask;
 
 always@(posedge clk or negedge rst_n) begin
-    if(!rst_n) begin
-        mask <= {REQ_WIDTH{1'b1}};
-    end
-    else if(|req) begin
-        mask <= req_pre;
-    end
+  if(!rst_n) begin
+    mask <= {REQ_WIDTH{1'b1}};
+  end
+  else if(|req) begin
+    mask <= to_mask;
+  end
 end
 
 Arbiter_Fixed_priority 
 #(
-    .REQ_WIDTH(REQ_WIDTH)
+  .REQ_WIDTH(REQ_WIDTH)
 )
 Arbiter_Fixed_priority_inst0
 (
-    .req(req_mask),
-    .gnt(gnt_mask)
+  .req(req_mask),
+  .gnt(gnt_mask)
 );
 
 Arbiter_Fixed_priority 
 #(
-    .REQ_WIDTH(REQ_WIDTH)
+  .REQ_WIDTH(REQ_WIDTH)
 )
 Arbiter_Fixed_priority_inst1
 (
-    .req(req_unmask),
-    .gnt(gnt_unmask)
+  .req(req_unmask),
+  .gnt(gnt_unmask)
 );
 
 endmodule
@@ -65,14 +65,14 @@ endmodule
 
 Arbiter_Round_robin2
 #(
-    .REQ_WIDTH(8)
+  .REQ_WIDTH(8)
 )
 Arbiter_Round_robin2_inst
 (
-    .clk     (clk  ),
-    .rst_n   (rst_n),
-    .req     (req  ),
-    .gnt     (gnt  )
+  .clk     (clk  ),
+  .rst_n   (rst_n),
+  .req     (req  ),
+  .gnt     (gnt  )
 );
 
 */   

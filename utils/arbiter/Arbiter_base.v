@@ -10,12 +10,12 @@
 
 module Arbiter_base
 #(
-    parameter REQ_WIDTH = 8
+  parameter REQ_WIDTH = 8
 )
 (
-    input   [REQ_WIDTH-1:0] req     ,
-    input   [REQ_WIDTH-1:0] base    ,
-    output  [REQ_WIDTH-1:0] gnt
+  input   [REQ_WIDTH-1:0] req     ,
+  input   [REQ_WIDTH-1:0] base    ,
+  output  [REQ_WIDTH-1:0] gnt
 );
 
 wire [2*REQ_WIDTH-1:0] req_double, gnt_double;
@@ -32,13 +32,13 @@ endmodule
 
 Arbiter_base
 #(
-    .REQ_WIDTH(8)
+  .REQ_WIDTH(8)
 )
 Arbiter_base_inst
 (
-    .req        (req    ),
-    .base       (base   ),
-    .gnt        (gnt    )
+  .req        (req    ),
+  .base       (base   ),
+  .gnt        (gnt    )
 );
 
 */   
