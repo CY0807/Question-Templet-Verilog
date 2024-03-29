@@ -82,7 +82,7 @@ initial begin
     # PERIOD; 
     
     wait(clk);
-    #0; wr_enable = 1;
+    wr_enable = 1;
     wait(full);
 
     # (PERIOD*10); wait(clk);
