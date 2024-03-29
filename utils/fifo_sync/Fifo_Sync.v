@@ -16,7 +16,7 @@ module Fifo_Sync
   output                      almostempty ,
   output                      full        ,
   output                      almostfull  ,
-  output  [$clog2(DEPTH)-1:0] data_cnt
+  output  [$clog2(DEPTH):0]   data_cnt
 );
 
 localparam ALMOST_EMPTY=1;      // number of items greater than zero
@@ -25,7 +25,7 @@ localparam ALMOST_FULL=DEPTH-1; // number of items less than DEPTH
 reg [WIDTH-1:0] wr_data_reg;
 reg [$clog2(DEPTH)-1:0] wPtr;
 reg [$clog2(DEPTH)-1:0] rPtr;
-reg [$clog2(DEPTH)-1:0] cnt;
+reg [$clog2(DEPTH):0] cnt;
 wire fifoWrValid;
 wire fifoRdValid;
 
@@ -53,7 +53,7 @@ Ram_inst
 );
     
 // write pointer logic
-always @ (posedge clk) begin
+always @ (posedge clk or negedge rst_n) begin
   if (!rst_n) begin
     wPtr <= 0;
   end
@@ -66,7 +66,7 @@ always @ (posedge clk) begin
 end
     
 // read pointer logic
-always @ (posedge clk) begin
+always @ (posedge clk or negedge rst_n) begin
   if (!rst_n) begin
     rPtr <= 0;
   end
@@ -79,7 +79,7 @@ always @ (posedge clk) begin
 end  
 
 // count logic
-always @ (posedge clk) begin
+always @ (posedge clk or negedge rst_n) begin
   if (!rst_n) begin
     cnt <= 0;
   end
