@@ -1,0 +1,123 @@
+
+// Despcription: This is a templet for doing verilog questions
+// Author: Chris Chen
+// Date: 2024-02-27
+// Version: 1.0
+
+`timescale 1ns / 1ps
+
+module tb_Ram_Sig();
+
+parameter PERIOD = 20;
+parameter WIDTH = 8;
+parameter DEPTH = 123;
+parameter DEPTH_BITS = $clog2(DEPTH);
+
+
+/************************* 1. signals *************************/
+
+// clock and reset
+reg clk, rst_n;
+
+// input and output signals
+wire [DEPTH_BITS-1:0] addr;
+wire [WIDTH-1:0] data_wr;
+wire [WIDTH-1:0] data;
+reg wren;
+
+// simulation signals
+reg [DEPTH_BITS-1:0] cnt;
+reg is_finish;
+integer i;
+
+
+/************************ 2. simulation ***********************/
+
+always #(PERIOD/2) clk = ~clk;
+
+// work flow
+initial begin
+  $display("\n***** Simulation Begin *****\n");
+  clk = 1;
+  rst_n = 0;
+  #100;
+  rst_n = 1;
+    
+  wait(is_finish);
+  #100;
+  $display("\n***** Simulation Finish *****\n");
+  $finish;
+end
+
+// init vars
+initial begin
+  i = 0;
+  is_finish = 0;
+  wren = 1;
+  cnt = 0;
+end
+
+// time out
+initial begin
+  # (PERIOD * 50000 * 2) // 2ms @ 50MHz
+  $display("\n***** Timeout Finish *****\n");
+  $finish;
+end
+
+// simulation logic
+initial begin
+  wait(rst_n);
+  # (PERIOD);
+  wait(cnt == DEPTH-1 && wren == 0);
+  is_finish = 1;
+end
+
+always@(posedge clk or negedge rst_n) begin
+  if(!rst_n) begin
+    wren <= 1;
+  end
+  else if(cnt == DEPTH-1) begin
+    wren <= ~wren;
+  end
+end
+
+always@(posedge clk or negedge rst_n) begin
+  if(!rst_n) begin
+    cnt <= 0;
+  end
+  else begin
+    cnt <= cnt + 1;
+    if(cnt == DEPTH-1) begin
+      cnt <= 0;
+    end
+  end
+end
+
+assign data = wren ? data_wr : 'dz;
+assign addr = cnt;
+assign data_wr = addr;
+
+/************************ 3. others ***************************/
+
+initial begin  
+  $dumpfile("wave.vcd"); 
+  $dumpvars(0, tb_Ram_Sig);
+end
+
+Ram_Sig
+#(
+  .WIDTH(8),
+  .DEPTH(128)
+)
+Ram_Sig_inst
+(
+  .clk    (clk    ),
+  .rst_n  (rst_n  ),
+  .wren   (wren   ),
+  .data   (data   ),
+  .addr   (addr   )
+);
+
+endmodule
+
+

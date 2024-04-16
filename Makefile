@@ -1,4 +1,4 @@
-USE_TOOLS := 1
+uSE_TOOLS := 1
 TOOLS_IS_BASIC := 1
 DIRS := $(shell find ./utils -maxdepth 3 -type d)
 INC := ./ $(foreach dir,$(DIRS),$(wildcard $(dir)/*.v)) Top.v tb_Top.v
@@ -26,7 +26,10 @@ wave: build
 autopush:
 	@git add .; git commit -m "auto commit"; git push -u origin main
 
-.PHONY := clean build wave
+test:
+	echo $(INC)
+
+.PHONY := clean build wave test
 .DEFAULT_GOAL := wave
 
 
