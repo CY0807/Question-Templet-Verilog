@@ -1,0 +1,13 @@
+
+build/
+gen/
+
+*.vcd
+wave
+
+*.o
+*.ko
+*.obj
+*.d
+*.elf
+
