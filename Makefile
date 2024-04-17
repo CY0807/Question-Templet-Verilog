@@ -24,7 +24,7 @@ wave: build
 	gtkwave ./gen/wave.vcd
 
 autopush:
-	@git add .; git commit -m "auto commit"; git push -u origin main
+	@git add .; git commit -m "auto commit"; git push -u github main; git push -u gitee main
 
 test:
 	echo $(INC)
