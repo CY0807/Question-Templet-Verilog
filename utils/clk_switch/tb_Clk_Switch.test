@@ -1,0 +1,94 @@
+
+// Despcription: This is a testbench for clock switch circuit
+// Author: Chris Chen
+// Date: 2024-04-23
+// Version: 1.0
+
+`timescale 1ns / 1ps
+
+module tb_Clk_Switch();
+
+parameter PERIOD_A = 20;
+parameter PERIOD_B = 14;
+
+
+/************************* 1. signals *************************/
+
+// clock and reset
+reg clk_a, clk_b, rst_n;
+
+// input and output signals
+reg select;
+
+// simulation signals
+reg is_finish;
+integer i;
+
+
+/************************ 2. simulation ***********************/
+
+always #(PERIOD_A/2) clk_a = ~clk_a;
+always #(PERIOD_B/2) clk_b = ~clk_b;
+
+// work flow
+initial begin
+  $display("\n***** Simulation Begin *****\n");
+  clk_a = 1;
+  clk_b = 1;
+  rst_n = 0;
+  #100;
+  rst_n = 1;
+    
+  wait(is_finish);
+  #100;
+  $display("\n***** Simulation Finish *****\n");
+  $finish;
+end
+
+// init vars
+initial begin
+  i = 0;
+  is_finish = 0;
+  select = 1;
+end
+
+// time out
+initial begin
+  # (PERIOD_A * 50000 * 1) // 1ms @ 50MHz
+  $display("\n***** Timeout Finish *****\n");
+  $finish;
+end
+
+// simulation logic
+initial begin
+  wait(rst_n);
+  # PERIOD_A;
+    
+  for(i=0; i<100; i=i+1) begin
+    #(100 + ($random % 100));
+    select = $random;
+  end
+       
+  is_finish = 1;
+end
+
+
+/************************ 3. others ***************************/
+
+initial begin  
+  $dumpfile("wave.vcd"); 
+  $dumpvars(0, tb_Clk_Switch);
+end
+
+Clk_Switch Clk_Switch_inst
+(
+  .clk_a   (clk_a    ),
+  .clk_b   (clk_b    ),
+  .rst_n   (rst_n    ),
+  .select  (select   ),
+  .clk_out (clk_out  )
+);
+
+endmodule
+
+
