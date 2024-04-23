@@ -26,10 +26,13 @@ wave: build
 autopush:
 	@git add .; git commit -m "auto commit"; git push -u github main; git push -u gitee main
 
+push:
+	@git push -u github main; git push -u gitee main
+
 test:
 	echo $(INC)
 
-.PHONY := clean build wave test
+.PHONY := clean build wave test autopush push
 .DEFAULT_GOAL := wave
 
 
