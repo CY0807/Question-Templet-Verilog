@@ -22,7 +22,7 @@ reg clk, rst_n;
 // input and output signals
 wire [DEPTH_BITS-1:0] addr;
 wire [WIDTH-1:0] data_wr;
-wire [WIDTH-1:0] data;
+wire [WIDTH-1:0] data_in, data_out;
 reg wren;
 
 // simulation signals
@@ -93,9 +93,8 @@ always@(posedge clk or negedge rst_n) begin
   end
 end
 
-assign data = wren ? data_wr : 'dz;
 assign addr = cnt;
-assign data_wr = addr;
+assign data_in = addr;
 
 /************************ 3. others ***************************/
 
@@ -111,11 +110,12 @@ Ram_Sig
 )
 Ram_Sig_inst
 (
-  .clk    (clk    ),
-  .rst_n  (rst_n  ),
-  .wren   (wren   ),
-  .data   (data   ),
-  .addr   (addr   )
+  .clk      (clk        ),
+  .rst_n    (rst_n      ),
+  .wren     (wren       ),
+  .data_in  (data_in    ),
+  .addr     (addr       ),
+  .data_out (data_out   )
 );
 
 endmodule

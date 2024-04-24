@@ -11,15 +11,17 @@ module Ram_Sig
   parameter DEPTH = 128
 )
 (
-  input  wire                       clk   ,
-  input  wire                       rst_n ,
-  input  wire                       wren  ,
-  inout  wire [WIDTH-1:0]           data  ,
-  input  wire [$clog2(DEPTH)-1:0]   addr
+  input  wire                       clk      ,
+  input  wire                       rst_n    ,
+  input  wire                       wren     ,
+  input  wire [WIDTH-1:0]           data_in  ,
+  input  wire [$clog2(DEPTH)-1:0]   addr     ,
+  output wire [WIDTH-1:0]           data_out
 );
 
 reg [WIDTH-1:0] mem [DEPTH-1:0];
 reg [WIDTH-1:0] data_rd;
+reg wren_r;
 
 always@(posedge clk or negedge rst_n) begin
   if(!rst_n) begin
@@ -30,16 +32,13 @@ always@(posedge clk or negedge rst_n) begin
   end
 end
 
-always@(posedge clk or negedge rst_n) begin
-  if(!rst_n) begin
-    
-  end
-  else if(wren) begin
-    mem[addr] <= data;
+always@(posedge clk) begin
+  if(wren) begin
+    mem[addr] <= data_in;
   end
 end
 
-assign data = wren ? 'dz : data_rd;
+assign data_out = data_rd;
 
 endmodule
 
@@ -53,11 +52,12 @@ Ram_Sig
 )
 Ram_Sig_inst
 (
-  .clk    (clk    ),
-  .rst_n  (rst_n  ),
-  .wren   (wren   ),
-  .data   (data   ),
-  .addr   (addr   )
+  .clk      (clk      ),
+  .rst_n    (rst_n    ),
+  .wren     (wren     ),
+  .data_in  (data_in  ),
+  .addr     (addr     ),
+  .data_out (data_out )
 );
 
 */

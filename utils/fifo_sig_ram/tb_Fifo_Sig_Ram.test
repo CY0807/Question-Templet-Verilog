@@ -1,0 +1,127 @@
+
+// Despcription: This is a testbench for Fifo using a Single port ram
+// Author: Chris Chen
+// Date: 2024-04-24
+// Version: 1.0
+
+`timescale 1ns / 1ps
+
+module tb_Fifo_Sig_Ram();
+
+parameter PERIOD = 20;
+parameter WIDTH = 8;
+parameter DEPTH = 128;
+parameter DEPTH_BITS = $clog2(DEPTH);
+
+
+/************************* 1. signals *************************/
+
+// clock and reset
+reg clk, rst_n;
+
+// input and output signals
+reg [WIDTH-1:0] data_in;
+reg wren, rden;
+wire [WIDTH-1:0] data_out;
+wire [DEPTH_BITS:0] data_cnt;
+wire full, empty;
+
+// simulation signals
+reg is_finish;
+integer i;
+reg wr_enable, rd_enable;
+
+/************************ 2. simulation ***********************/
+
+always #(PERIOD/2) clk = ~clk;
+
+// work flow
+initial begin
+  $display("\n***** Simulation Begin *****\n");
+  clk = 1;
+  rst_n = 0;
+  #100;
+  rst_n = 1;
+    
+  wait(is_finish);
+  #100;
+  $display("\n***** Simulation Finish *****\n");
+  $finish;
+end
+
+// init vars
+initial begin
+  i = 0;
+  is_finish = 0;
+  wren = 0;
+  rden = 0;
+  wr_enable = 0;
+  rd_enable = 0;
+  data_in = 0;
+end
+
+// time out
+initial begin
+  # (PERIOD * 50000 * 2) // 2ms @ 50MHz
+  $display("\n***** Timeout Finish *****\n");
+  $finish;
+end
+
+// simulation logic
+initial begin
+  wait(rst_n);
+  # (PERIOD);
+
+  // **********user logic begin***********
+
+  wr_enable = 1;
+  #(PERIOD * 280);
+  rd_enable = 1;
+  #(PERIOD * 180);
+  wr_enable = 0;
+  #(PERIOD * 180);
+  #(PERIOD * 180);
+  rd_enable = 0;
+  #(PERIOD * 10);
+  
+  // **********user logic begin***********
+  
+  is_finish = 1;
+end
+
+always@(posedge clk) begin
+  wren <= wr_enable;
+  rden <= rd_enable;
+  if(wren & !full) begin
+    data_in <= $random;
+  end
+end
+
+/************************ 3. others ***************************/
+
+initial begin  
+  $dumpfile("wave.vcd"); 
+  $dumpvars(0, tb_Fifo_Sig_Ram);
+end
+
+Fifo_Sig_Ram
+#(
+  .WIDTH(WIDTH),
+  .DEPTH(DEPTH)
+)
+Fifo_Sig_Ram_inst
+(
+  .clk       (clk       ),
+  .rst_n     (rst_n     ),
+  .wren      (wren      ),
+  .data_in   (data_in   ),
+  .rden      (rden      ),
+  .data_out  (data_out  ),
+  .data_cnt  (data_cnt  ),
+  .full      (full      ),
+  .empty     (empty     )
+);
+
+endmodule
+
+

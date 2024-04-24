@@ -20,10 +20,10 @@ module Arbiter_Round_robin2
 );
 
 reg [REQ_WIDTH-1:0] mask;
-wire [REQ_WIDTH-1:0] req_mask, req_unmask, to_mask, gnt_mask, gnt_unmask;
+wire [REQ_WIDTH-1:0] req_mask, req_unmask, mask_pre, gnt_mask, gnt_unmask;
 
-assign to_mask[0] = 1'b0;
-assign to_mask[REQ_WIDTH-1:1] = to_mask[REQ_WIDTH-2:0] | gnt[REQ_WIDTH-2:0];
+assign mask_pre[0] = 1'b0;
+assign mask_pre[REQ_WIDTH-1:1] = mask_pre[REQ_WIDTH-2:0] | gnt[REQ_WIDTH-2:0];
 assign req_mask = req & mask;
 assign req_unmask = req;
 assign gnt = (|req_mask) ? gnt_mask : gnt_unmask;
@@ -33,7 +33,7 @@ always@(posedge clk or negedge rst_n) begin
     mask <= {REQ_WIDTH{1'b1}};
   end
   else if(|req) begin
-    mask <= to_mask;
+    mask <= mask_pre;
   end
 end
 
